@@ -2,13 +2,13 @@ import torch
 from torch.utils.data import DataLoader
 from torch import distributed as dist
 
-import data.dataset as datasets
+from .voc_dataset import Classification as VOCClassification
 from options import args
 
 def get_dataloader(mode: str):
     assert mode in ['train', 'test']
     if args.dataset == 'voc':
-        dataset = datasets.VOCClassification(args, mode)
+        dataset = VOCClassification(args, mode)
     else:
         raise NotImplementedError()
     sampler = torch.utils.data.distributed.DistributedSampler() if dist.is_initialized() else None

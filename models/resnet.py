@@ -1,7 +1,7 @@
 import torch
 from torch import Tensor
 import torch.nn as nn
-from .utils import load_state_dict_from_url
+from torch.hub import load_state_dict_from_url
 from typing import Type, Any, Callable, Union, List, Optional
 
 from hard_attention import MaskPredictor
@@ -140,13 +140,13 @@ class Bottleneck(nn.Module):
         if self.downsample is not None:
             identity = self.downsample(x)
         
-        mask = self.predictor(mask, meta)
-        out *= mask
+        mask = self.predictor(out, meta)
+        out = out * mask
 
         out += identity
         out = self.relu(out)
 
-        return (out, meta)
+        return out, meta
 
 
 class ResNet(nn.Module):
@@ -269,7 +269,7 @@ def _resnet(
     if pretrained:
         state_dict = load_state_dict_from_url(model_urls[arch],
                                               progress=progress)
-        model.load_state_dict(state_dict)
+        model.load_state_dict(state_dict, strict=False)
     return model
 
 

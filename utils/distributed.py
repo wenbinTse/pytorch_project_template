@@ -7,7 +7,7 @@ import os
 from options import args
 from utils import info
 
-def init_distributed():
+def init_distributed_env():
     torch.backends.cudnn.benchmark = True
     
     np.random.seed(args.seed)
@@ -24,3 +24,16 @@ def init_distributed():
         dist.init_process_group(backend='nccl')
     
     info('Using {} GPUs'.format(device_count))
+
+def init_distributed_model(model: torch.nn.Module) -> torch.nn.Module :
+    model.cuda()
+    if torch.cuda.device_count() > 1:
+        model = torch.nn.parallel.DistributedDataParallel(model)
+    return model
+
+def is_primary_device():
+    return not (dist.is_initialized() and dist.get_rank() != 0)
+
+def dist_barrier():
+    if dist.is_initialized():
+        dist.barrier()

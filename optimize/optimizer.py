@@ -3,8 +3,8 @@ import torch.nn as nn
 
 from options import args
 
-def get_optimizer(model: nn.Module):
-    trainable_params = [x for x in model.parameters() if x.require_grad]
+def get_optimizer(model: nn.Module) -> optim.Optimizer :
+    trainable_params = [x for x in model.parameters() if x.requires_grad]
     if args.optimizer == 'adam':
         optimizer = optim.Adam(
             trainable_params,
